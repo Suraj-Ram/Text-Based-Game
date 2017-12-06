@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Level 3</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+	var input;
+	var room;
+	var inventory = [];
+
+	var pFirst = "<p>";
+	var pEnd = "</p>";
+	var pFirstUserCallback = "<p id='userCallback'>> "
+	var N = "north";
+	var E = "east";
+	var S = "south";
+	var W = "west";
+	var alreadyHave = "You already have it in your inventory";
+	var filterMade = false;
+
+	var arrayCheck;
+	
+	var startDesc = "You have to make pond water drinkable for your family"
+	var backyardDesc = "You are in your backyard. You can go east. You see a pond, a stone and a used fire pit filled with charcoal";
+	var livingRoomDesc = "You are in the living room. You can go west or east. You see a helper from the UN, a knife, a cup and a water bottle, perhaps you could talk to him"
+	var bedroomDesc = "You are in the bedroom. You can go west. You see a ladder to climb to the attic, a water glass, and a piece of cloth"
+	var atticDesc = "You are in the attic, you can climb back down. You see a bag of sand"
+
+	var pondDesc = "You see a pond with water and there is tons of algae"
+	var firePitDesc = "It's a fire pit thats been used before, there are lots of pieces of charcoal"
+	var cupDesc = "A clear plastic cup with a handle"
+	var stoneDesc = "It's a smooth stone abouth 3 inch in diameter"
+	var unHelperDesc = "Hello, my name is Bob. I am a volunteer helper for the UN. Today I will tell you how to filer pond water. As pond water contains a lot of pond scum and other organic matter we will need to make a filter. To make your filter you should first need a disposable plastic water bottle, some sand, powdered charcoal and a piece of cloth. You will also need a knife to cut the bottle and a stone to crush the charcoal. First, cut the bottom off the bottle and put a piece of cloth down the bottle. Next, crush up the charcoal with a stone and add a 1 inch layer of it to the bottle. Then, add a 2 inch layer of sand and that’s it!"
+	var sandDesc = "You see a bag of sand"
+	var bottleDesc = "A bottle made out of thin food safe plastic"
+	var kinfeDesc = "A small steel kitchen paring knife"
+	var clothDesc = "A 3 inch by 3inch piece of cotton choth"
+	var waterGlassDesc = "A 300mL glass made out of glass"
+
+	var tweetButton = '<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="I just played a game that teaches the hurricane stricken puerto ricans, how to purify water." data-url="http://surajatron.comxa.com/textgame/" data-via="surajram123" data-lang="en" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8">'
+
+
+	$(document).ready(function() {
+		$("#mainForm").submit(function(event) {
+    		event.preventDefault();
+		});
+		gameStart();
+
+		$("#mainForm").submit(function() {
+			input = document.getElementById("textInput").value;
+
+			print(pFirstUserCallback + input + pEnd);
+
+			if (input == "inventory") {
+				print("You have: " + inventory);
+			}
+			else if (input == "help") {
+				print("insert help here")
+			}
+
+			else if (room == "Start") {
+				gameStart2();
+			}
+			else if (room == "Start 2") {
+				enterBackyard();
+			}
+			else if (input == "look") {
+				if(room == "Backyard") {print(backyardDesc)}
+				else if (room == "Living room") {print(livingRoomDesc)}
+				else if (room == "Bedroom") {print(bedroomDesc)}
+				else if (room == "Attic") {print(atticDesc)}
+			}
+
+			//global
+
+
+
+
+			else if(input == "use powdered charcoal on bottle") {
+				arrayCheck = jQuery.inArray("Powdered charcoal", inventory)
+				if (arrayCheck != -1) {
+					arrayCheck = jQuery.inArray("Bottle with cloth", inventory)
+					if (arrayCheck != -1) {
+						print("You have added a layer of charcoal powder in your filter")
+						inventory.splice(inventory.indexOf("Bottle with cloth"), 1);
+						inventory.push("Bottle with charcoal")
+					}
+					else {
+						print("You don't have a bottle with a cloth")
+					}
+				}
+				else {
+					print("You don't have powdered charcoal");
+				}
+			}//use charcoal on bottle
+
+			else if (input == "use sand on bottle") {
+				arrayCheck = jQuery.inArray("Bag of sand", inventory)
+				if (arrayCheck != -1) {
+					arrayCheck = jQuery.inArray("Bottle with charcoal", inventory)
+					if(arrayCheck != -1) {
+						print("You have added a layer of sand over the charcoal in your filter")
+						print("You have sucessfully completed making your filter")
+						inventory.splice(inventory.indexOf("Bottle with charcoal"), 1);
+						inventory.push("Filter")
+						filterMade = true;
+					}
+					else {
+						print("You don't have a bottle with charcoal")
+					}
+				}
+				else {
+					print("You don't have a bag of sand")
+				}
+			}
+			else if (input == "drink water") {
+				arrayCheck = jQuery.inArray("Glass filled with clean water")
+				if (arrayCheck != -1) {
+					win();
+				}
+			}
+
+
+			else if (room == "Backyard") {
+
+				if (input == "east") {
+					enterLivingRoom();
+				}
+				else if (input == "look at pond") {
+					print(pondDesc)
+				}
+				else if (input == "look at fire pit") {
+					print(firePitDesc);
+				}
+				else if (input == "look at stone") {
+					print(stoneDesc);
+				}
+				
+				else if (input == "take charcoal") {
+					arrayCheck = jQuery.inArray("Charcoal", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Charcoal")
+						print("Charcoal taken")
+					}
+				}
+				else if (input == "take stone") {
+					arrayCheck = jQuery.inArray("Stone", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Stone")
+						print("Stone taken")
+					}
+				}//end of take stone
+				
+
+				else if (input == "use stone on charcoal") {
+					arrayCheck = jQuery.inArray("Stone", inventory)
+					if(arrayCheck != -1) {
+						arrayCheck = jQuery.inArray("Charcoal", inventory)
+						if(arrayCheck != -1) {
+							print("You powder the charcoal using the stone")
+							inventory.splice(inventory.indexOf("Charcoal"), 1);
+							inventory.push("Powdered charcoal");
+						}
+						else {
+							print("You don't have any charcoal")
+						}
+					}
+					else {
+						print("You don't have a stone")
+					}
+				}//end of use stone on char
+				else if (input == "use cup on pond") {
+					arrayCheck = jQuery.inArray("Cup", inventory)
+					if(arrayCheck != -1) {
+						print("You dip the cup into the pond and take a full cup of pond water. The water has algae floating in it and could potentially contain harmful pathogens");
+						inventory.splice(inventory.indexOf("Cup"), 1);
+						inventory.push("Cup filled with pond water");
+
+					}
+					else {
+						print("You don't have a cup")
+					}
+				}
+				else if (input == "place glass under filter") {
+					arrayCheck = jQuery.inArray("Water glass", inventory)
+					if (arrayCheck != -1) {
+						arrayCheck = jQuery.inArray("Filter", inventory)
+						if(arrayCheck != -1) {
+							inventory.splice(inventory.indexOf("Water glass"), 1)
+							inventory.splice(inventory.indexOf("Filter"), 1)
+							print("You have put the water glass under the filter")
+							inventory.push("Glass under filter")
+							//placing glass under filter
+						}
+						else {
+							print("You don't have a fully made filter")
+						}
+					}
+					else {print("You don't have a water glass")}
+				}//end of placing glass under filter
+			else if (input === "pour pond water into filter") {
+				//
+				arrayCheck = jQuery.inArray("Cup filled with pond water", inventory)
+				if (arrayCheck != -1) {
+					arrayCheck = jQuery.inArray("Glass under filter", inventory)
+					if (arrayCheck != -1) {
+						print("You slowly the water on top of the filter and clean clear water fills the glass underneath")
+						inventory.splice(inventory.indexOf("Cup filled with pond water"), 1)
+						inventory.splice(inventory.indexOf("Glass under filter"), 1)
+						inventory.push("Filter")
+						inventory.push("Glass filled with clean water")
+					}
+					else {print("You don't have a glass under the filter")}
+				}
+				else {
+					print("You don't have a cup filled with pond water")
+				}
+
+			}//end of pour pond water
+
+
+			}//end of backyard
+
+			else if (room == "Living Room") {
+				if (input == "east") {
+					enterBedroom();
+				}
+				else if (input == "west") {
+					enterBackyard()
+				}
+				else if (input == "talk to UN helper") {
+					print(unHelperDesc);
+				}
+				else if (input == "look at bottle") {
+					print(bottleDesc);
+				}
+				else if (input == "look at knife") {
+					print(kinfeDesc);
+				}
+				else if (input == "look at cup") {
+					print(cupDesc);
+				}
+				else if (input == "take bottle") {
+					arrayCheck = jQuery.inArray("Bottle", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave);
+					}
+					else {
+						inventory.push("Bottle")
+						print("Bottle taken")
+					}
+				}
+				else if (input == "take knife") {
+					arrayCheck = jQuery.inArray("Knife", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Knife")
+						print("Knife taken")
+					}
+				}
+				else if (input == "take cup") {
+					arrayCheck = jQuery.inArray("Cup", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Cup")
+						print("Cup taken")
+					}
+				}
+				else if (input == "use knife on bottle") {
+					arrayCheck = jQuery.inArray("Knife", inventory)
+					if (arrayCheck != -1) {
+						arrayCheck = jQuery.inArray("Bottle", inventory)
+						if (arrayCheck != -1) {
+							//
+							print("You cut the bottom of the bottle off")
+							inventory.splice(inventory.indexOf("Bottle"), 1);
+							inventory.push("Bottle with bottom cut off");
+						}
+						else {print("You don't have a bottle");}
+					}
+					else {print("You dont have a knife");}
+				}
+
+			}//end of living room
+
+			else if (room == "Bedroom") {
+				if (input == "west") {
+					enterLivingRoom()
+				}
+				else if (input == "climb ladder") {
+					enterAttic()
+				}
+				else if (input == "look at cloth") {
+					print(clothDesc)
+				}
+				else if (input == "look at water glass") {
+					print(waterGlassDesc)
+				}
+				else if (input == "take water glass") {
+					arrayCheck = jQuery.inArray("Water glass")
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Water glass")
+						print("Water glass taken")
+					}
+				}
+				else if (input == "take cloth") {
+					arrayCheck = jQuery.inArray("Cloth", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Cloth")
+						print("Cloth taken")
+					}
+				}
+				else if (input == "use cloth on bottle") {
+					arrayCheck = jQuery.inArray("Bottle with bottom cut off", inventory)
+					if (arrayCheck != -1) {
+						arrayCheck = jQuery.inArray("Cloth", inventory) 
+						if(arrayCheck != -1) {
+							print("You have placed the cloth into the bottle")
+							inventory.splice(inventory.indexOf("Bottle with bottom cut off"), 1);
+							inventory.splice(inventory.indexOf("Cloth"), 1);
+							inventory.push("Bottle with cloth")
+						}
+						else {
+							print("You don't have the cloth")
+						}
+
+					}
+					else {
+						print("You need to have a bottle with the bottom cut off")
+					}
+				}//end of use cloth on bottle
+
+			}//end of bedroom
+
+			else if (room == "Attic") {
+				if (input == "climb down") {
+					enterBedroom();
+				}
+				else if (input == "look at bag of sand") {
+					print(sandDesc);
+				}
+				else if (input == "take bag of sand") {
+					arrayCheck = jQuery.inArray("Bag of sand", inventory);
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Bag of sand")
+						print("Bag of sand taken")
+					}
+				}
+
+			}
+
+			
+
+			$("#consoleOutput").scrollTop($("#consoleOutput")[0].scrollHeight);
+			document.getElementById("textInput").value = "";
+
+		});
+	});	
+
+	function print(a) {
+		$("#consoleOutput").append(pFirst + a + pEnd);
+	}
+	function gameStart() {
+		room = "Start";
+		print("Level 3: Making a filter to clean pond water")
+		print("Hit enter to start...");
+	}
+	function gameStart2() {
+		room = "Start 2"
+		print(startDesc);
+		print("Hit enter to continue...");
+	}
+	function enterBedroom() {
+		room = "Bedroom";
+		print(bedroomDesc);
+		document.getElementById("textInput").setAttribute("list", "bedroomCommands");
+	}
+	function enterLivingRoom() {
+		room = "Living Room"
+		print(livingRoomDesc);
+	}
+
+	function enterBackyard() {
+		room = "Backyard";
+		print(backyardDesc);
+		document.getElementById("textInput").setAttribute("list", "backyardCommands");
+	}
+	function enterAttic() {
+		room = "Attic";
+		print(atticDesc);
+	}
+	
+	function win() {
+		print("You take a sip of clean water and feel refreshed and hydrated")
+		print("You have finished the full game")
+		print("Please share this game with friends and family")
+		$("#consoleOutput").append(tweetButton)
+
+
+
+		//<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSemP-gq6u5SUqjMd928bnrbHyRNVuC-iL41FcINDLb4C8vkuA/viewform?embedded=true" width="760" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+		$("#consoleOutput").append('<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSemP-gq6u5SUqjMd928bnrbHyRNVuC-iL41FcINDLb4C8vkuA/viewform?embedded=true" width="760" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>');
+
+	}
+
+</script>
+
+<div id="consoleOutput">
+	<p id="welcomeText"></p>
+</div>
+
+<form onsubmit="" id="mainForm">
+	<input type="text" id="textInput" autofocus="autofocus" autocomplete="off">
+	<!--list="commands"-->
+	<datalist id="backyardCommands">
+		<option id="east">
+		<option id="look at pond">
+		<option id="look at fire pit">
+		<option id="look at stone">
+		<option id="take charcoal">
+		<option id="take stone">
+		<option id="use stone on charcoal">
+	</datalist>
+	<datalist id="bedroomCommands">
+		<option value="north"></option>
+		<option value="take newspaper"></option>
+		<option value="look at newspaper"></option>
+	</datalist>
+
+
+	<input type="submit" id="submitButton" name="sumbit">
+</form>
+
+</body>
+</html>

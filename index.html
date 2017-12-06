@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PR</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+	var input;
+	var room;
+	var inventory = [];
+
+	var pFirst = "<p>";
+	var pEnd = "</p>";
+	var pFirstUserCallback = "<p id='userCallback'>> "
+	var arrayCheck;
+	
+
+	var mainEntrenceDesc = "main entrance";
+	var startDesc = "Hit enter to start...";
+	var livingRoomDesc = "You are in the living room. You can go south or east.";
+	var kitchenDesc = "You are in the Kitchen. You can go west and east. You see a steel pot, and some matches";
+	var bedroomDesc = "You are in the Bedroom. You can go north. You see a bottle of dirty water and a radio";
+	var backyardDesc = "You are in the Backyard. You can go west. You see a fire pit and some fire wood";
+
+	var woodInPit = false;
+	var fireLit = false;
+	var potOnFire = false;
+	var potFilledWithDirtyWater = false;
+	var potWaterState;
+	var potWaterTemp;
+	var eBroadcast1 = "<i>EMERGENCY! EMERGENCY! DO NOT DRINK WATER STRAIGHT FROM RIVERS, THEY ARE CONTAMINATED. BOIL THEM FIRST.</i>";
+	var eBroadcast2 = "<i> To boil water put some fire wood in a fire pit, then fill a steel pot with the dirty water MAKE SURE that the water is clear and free of any debris. After that, place the pot on the fire - slightly elevate it to make sure the flame still keeps going. Bring the water up to a rolling boil and wait for 1 minute. Then, take the pot off the heat ans let it cool. You can now drink the sanitized water to stay hydrated</i>";
+
+	var potDesc = "A shiny steel pot";
+	var matchesDesc = "A box of matches with a striker on either side";
+	var bottleDesc = "A plastic water bottle filled with 500 mL of clear water collected from a nearby stream";
+	var radioDesc = "An old red pocket radio with couple buttons and two black speakers";
+	var firewoodDesc = "A couple logs of wood";
+	var firePitDesc = "Several bricks laid out in a circular formation";
+	
+
+
+	$(document).ready(function() {
+		$("#mainForm").submit(function(event) {
+    		event.preventDefault();
+		});
+		gameStart();
+
+		$("#mainForm").submit(function() {
+			input = document.getElementById("textInput").value;
+
+			print(pFirstUserCallback + input + pEnd);
+
+			if (input == "inventory") {
+				print("You have: " + inventory);
+			}
+			else if (input == "help") {
+				print("insert help here")
+			}
+			else if (input == "look") {
+				if(room == "Living Room") {print(livingRoomDesc);}
+				else if(room == "Bedroom") {print(bedroomDesc);}
+				else if (room == "Kitchen") {print(kitchenDesc);}
+				else if (room == "Backyard") {print(backyardDesc);}
+
+			}
+
+			else if (room == "Start") {
+				enterLivingRoom();
+			}
+			else if (room == "Living Room") {
+				if (input == "south") {
+					enterBedroom()
+				}
+				else if (input == "east") {
+					enterKitchen();
+				}
+			}
+			else if (room == "Bedroom") {
+				if (input == "north") {
+					enterLivingRoom();
+				}
+				else if(input == "look at bottle") {
+					print(bottleDesc);
+				}
+				else if (input == "take bottle") {
+					inventory.push("Bottle of dirty water")
+					print("Bottle of dirty water taken.")
+				}
+				else if (input == "use radio") {
+					print("You hear an emergency broadcast from the Puerto Rican government")
+					print(eBroadcast1);
+					print(eBroadcast2);
+				}
+
+			}
+			else if (room == "Kitchen") {
+				if (input == "west") {
+					enterLivingRoom();
+				}
+				else if (input == "east") {
+					enterBackyard();
+				}
+				else if (input == "look at steel pot") {
+					print(potDesc);
+				}
+				else if (input == "take steel pot") {
+					inventory.push("Steel pot");
+					print("Steel pot taken");
+				}
+				else if (input == "take water bottle") {
+					inventory.push("Water bottle");
+					print("Water bottle taken");
+				}
+				else if (input == "take matches") {
+					inventory.push("Matches");
+					print("Matches taken");
+				}
+			}
+			else if (room == "Backyard") {
+				if (input == "west") {
+					enterKitchen();
+				}
+				else if (input == "take fire wood") {
+					print("It's too heavy, you can't carry it");
+				}
+				else if (input == "use fire wood on fire pit") {
+					print("You put some wood inside the pit");
+					woodInPit = true;
+				}
+				else if (input == "use matches on fire wood") {
+					if (woodInPit) {
+						//insert here
+						arrayCheck = jQuery.inArray("Matches", inventory);
+						if (arrayCheck != -1) {
+							print("You strike the match on the box and hold it to the wood and it catches fire");
+							fireLit = true;
+						}
+						else {
+							print("You need matches");
+						}
+					}//end wood in pit check
+					else {
+						print("The wood has to be in the fire pit, it's dangerous if the wood is burnt without a pit");
+					}
+				}//end of use matches
+
+				else if (input == "fill pot with dirty water") {
+					arrayCheck = jQuery.inArray("Steel pot", inventory);
+					if (arrayCheck != -1) {
+						arrayCheck = jQuery.inArray("Bottle of dirty water", inventory);
+						if (arrayCheck != -1) {
+							print("You have filled the pot with dirty water")
+							potFilledWithDirtyWater = true;
+							potWaterState = "dirty";
+						}
+						else {print("You don't have any dirty water")}
+					}//end of pot check
+					else {print("You don't have a steel pot");}
+				}//end of fill pot 
+
+				else if (input == "place pot on fire") {
+					if (fireLit) {
+						//
+						if (potFilledWithDirtyWater) {
+							print("Pot placed on fire")//boilng time = 2min
+							//30 sec = 1min
+							print("Water starting to boil");
+							$("#consoleOutput").append("<p id='boilTimer'>" + "Wait: 4 seconds" + pEnd);
+							setTimeout(boilTimerFunc1, 1000);
+						}
+						else {print("Pot is not filled with dirty water")}
+					}
+					else {print("You first need a fire")}
+				}
+			else if (input == "take pot off the fire") {
+				if (potWaterState = "clean") {
+					print("You take the pot off the fire and onto the ground")
+					$("#consoleOutput").append("<p id='boilCoolTimer'>" + "Wait for water to cool: 6 seconds" + pEnd);
+					setTimeout(boilCoolTimer1, 1000);
+				}
+				else {print("The water is still dirty")}
+			}
+			else if (input == "drink water") {
+				if(potWaterState = "dirty") {
+					if(potWaterTemp = "room") {
+						print("You drink the water and feel refreshed and hydrated")
+						print("You have completed the challenge of: Sanitizing water by boiling it")
+						print("<a href='b.html'>Click here for next level<a>")
+					}
+					else {print("The water is too hot to drink, let it cool")}
+				}
+				else{print("The water is dirty and undrinkable")}
+			}
+
+
+				
+
+
+
+			}//end of backyard
+
+			$("#consoleOutput").scrollTop($("#consoleOutput")[0].scrollHeight);
+			document.getElementById("textInput").value = "";
+
+		});
+	});	
+
+	function print(a) {
+		$("#consoleOutput").append(pFirst + a + pEnd);
+	}
+	function gameStart() {
+		room = "Start";
+		print("Hit enter to start...");
+	}
+
+	function enterLivingRoom() {
+		room = "Living Room";
+		print(livingRoomDesc);
+		document.getElementById("textInput").setAttribute("list", "livingRoomCommands");
+	}
+	function enterKitchen() {
+		room = "Kitchen";
+		print(kitchenDesc);
+		document.getElementById("textInput").setAttribute("list", "kitchenCommands");
+	}
+	function enterBedroom() {
+		room = "Bedroom";
+		print(bedroomDesc);
+		document.getElementById("textInput").setAttribute("list", "bedroomCommands");
+	}
+	function enterBackyard() {
+		room = "Backyard";
+		print(backyardDesc);
+		document.getElementById("textInput").setAttribute("list", "backyardCommands");
+		if(fireLit) {
+			print("There is a steel pot on top of a fire");
+		}
+	}
+	function boilTimerFunc1() {
+		document.getElementById("boilTimer").innerHTML = "Wait: 3 seconds";
+		setTimeout(boilTimerFunc2, 1000);
+	}
+	function boilTimerFunc2() {
+		document.getElementById("boilTimer").innerHTML = "Wait: 2 seconds";
+		setTimeout(boilTimerFunc3, 1000);
+	}
+	function boilTimerFunc3() {
+		document.getElementById("boilTimer").innerHTML = "Wait: 1 seconds";
+		setTimeout(boilTimerFunc4, 1000);
+	}
+	function boilTimerFunc4() {
+		document.getElementById("boilTimer").innerHTML = "Finished boiling water, take it off the fire and it it cool";
+		potWaterState = "clean";
+		potWaterTemp = "hot";
+	}
+	function boilCoolTimer1() {
+		document.getElementById("boilCoolTimer").innerHTML = "Wait for water to cool: 5 seconds";
+		setTimeout(boilCoolTimer2, 1000);
+	}
+	function boilCoolTimer2() {
+		document.getElementById("boilCoolTimer").innerHTML = "Wait for water to cool: 4 seconds";
+		setTimeout(boilCoolTimer3, 1000);
+	}
+	function boilCoolTimer3() {
+		document.getElementById("boilCoolTimer").innerHTML = "Wait for water to cool: 3 seconds";
+		setTimeout(boilCoolTimer4, 1000);
+	}
+	function boilCoolTimer4() {
+		document.getElementById("boilCoolTimer").innerHTML = "Wait for water to cool: 2 seconds";
+		setTimeout(boilCoolTimer5, 1000);
+	}
+	function boilCoolTimer5() {
+		document.getElementById("boilCoolTimer").innerHTML = "Wait for water to cool: 1 seconds";
+		setTimeout(boilCoolTimer6, 1000);
+	}
+	function boilCoolTimer6() {
+		document.getElementById("boilCoolTimer").innerHTML = "Water cooled and ready to drink";
+		potWaterTemp = "room";
+	}
+
+
+</script>
+
+<div id="consoleOutput">
+	<p id="welcomeText"></p>
+</div>
+
+<form onsubmit="" id="mainForm">
+	<input type="text" id="textInput" autofocus="autofocus" autocomplete="off">
+	<!--list="commands"-->
+	<datalist id="livingRoomCommands">
+		<option value="south"></option>
+		<option value="east"></option>
+	</datalist>
+	<datalist id="bedroomCommands">
+		<option value="north"></option>
+		<option value="take bottle"></option>
+		<option value="use radio"></option>
+	</datalist>
+	<datalist id="kitchenCommands">
+		<option value="west"></option>
+		<option value="east"></option>
+		<option value="take steel pot"></option>
+		<option value="take water bottle"></option>
+		<option value="take matches"></option>
+	</datalist>
+	<datalist id="backyardCommands">
+		<option value="west"></option>
+		<option value="take fire wood"></option>
+		<option value="use fire wood on fire pit"></option>
+		<option value="use matches on fire wood"></option>
+		<option value="fill pot with dirty water"></option>
+		<option value="place pot on fire"></option>
+		<option value="take pot off the fire"></option>
+		<option value="drink water"></option>
+	</datalist>
+
+
+
+	<input type="submit" id="submitButton" name="sumbit">
+</form>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+#mainForm {
+	position: absolute;
+  	right: 0;
+  	bottom: 15px;
+  	left: 0;
+  	padding: 16px;
+  	background-color: #efefef;
+  	text-align: center;
+}
+#consoleOutput {
+	height: auto;
+	position: absolute;
+	bottom: 60px;
+	overflow: auto;
+
+}
+.printedElements {
+	color: blue;
+	font-family: 'Roboto', sans-serif;
+}
+strong {
+	font-weight: bold;
+
+}
+#bold {
+	color: red;
+	font-family: 'Ubuntu Mono', monospace;
+}
+
+body,input {
+	font-family: 'Ubuntu Mono', monospace;
+	font-size: 20px;
+}
+#startTitle {
+	font-family: 'Eater', cursive;
+	font-size: 48px;
+	text-align: center;
+	padding: 8px;
+	margin-bottom: 0px;
+	margin: 0;
+}
+
+tr {
+	margin: 0;
+	padding: 0;
+}
+#userCallback {
+	color: red;
+	font-family: 'Ubuntu Mono', monospace;
+}
+p {
+	font-family: 'Roboto', sans-serif;
+}
