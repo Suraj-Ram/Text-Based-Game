@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Level 2</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+	var input;
+	var room;
+	var inventory = [];
+
+	var pFirst = "<p>";
+	var pEnd = "</p>";
+	var pFirstUserCallback = "<p id='userCallback'>> "
+	var N = "north";
+	var E = "east";
+	var S = "south";
+	var W = "west";
+	var alreadyHave = "You already have it in your inventory";
+
+
+	var arrayCheck;
+	var purify;
+	var waterClean = false;
+
+	var startDesc = "You have arrived at your friend's house and you need to help him sanitize water from his well.";
+	var bedroomDesc = "You are in the bedroom. You can go north. You see a newspaper on the table.";
+	var kitchenDesc = "You are in the kitchen. You can go south or east. You a see cabinet under the sink and a cup on the counter";
+	var backyardDesc = "You are in the backyard. You can go west. You see a well full of water and a bucket.";
+
+	var bedroomDescNoNews = "You are in the bedroom. You can go north.";
+
+	var newspaperDesc = `
+	<h2 id='newspaperTitle'>The New Day</h3>
+	<br>
+	<p id='newspaperBody'> Before drinking water from wells DISINFECT it using bleach</p>
+	<p id='newspaperBody'><strong> For every liter (quart) of dirty water, ADD 4 drops of bleach </strong></p>
+	<p><u>By the way, 1 gallon equals 4 quarts</u></p>
+
+	`;
+	 //Add 4 drops of bleach to every liter (quart) of water
+	var cabinetDesc = "You see a wooden cabinet under the sink, it looks like you can open it"
+	var insideCabinet = "Inside the cabinet you see a bottle of bleach and an eye dropper";
+	var bleachDesc = "You see a bottle of Clorox brand bleach";
+	var eyeDropperDesc = "You see a plastic tube with a rubber bulb on the end. This tool is used to transfer droplets of a liquid to something else";
+	var wellDesc = "You see a deep well with clear water at the bottom";
+	var bucketDesc = "A 5 gallon steel bucket with a handle";
+	var cupDesc = "A plastic cup used to drink water"
+
+
+	$(document).ready(function() {
+		$("#mainForm").submit(function(event) {
+    		event.preventDefault();
+		});
+		gameStart();
+
+		$("#mainForm").submit(function() {
+			input = document.getElementById("textInput").value;
+
+			print(pFirstUserCallback + input + pEnd);
+
+			if (input == "inventory") {
+				print("You have: " + inventory);
+			}
+			else if (input == "help") {
+				print("insert help here")
+			}
+			else if (input == "look") {
+				if(room == "Bedroom") {print(bedroomDesc);}
+				else if(room == "Kitchen") {print(kitchenDesc);}
+				else if(room == "Backyard") {print(backyardDesc);}
+			}//end of look
+
+			else if (input == "look at newspaper") {
+					arrayCheck = jQuery.inArray("Newspaper", inventory);
+					if (arrayCheck != -1) {
+						//print("You need to take it before you can look at it");
+						print(newspaperDesc);
+					}
+					else {
+						//print(newspaperDesc);
+						//print("have newspaper")
+						print("You need to have the newspaper");
+					}
+			}
+
+			else if (purify) {
+				if (input == "80") {
+					print("You are correct!  You use the eye dropper and drop 80 drops of bleach in to the steel bucket");
+					purify = false;
+					print("You need to wait 60 minutes before you can drink")
+					$("#consoleOutput").append("<p id='waitTimer'>Wait time: 60 minutes</p>");
+					setTimeout(waitTimer1, 1000);
+					
+				}
+				else {
+					print("That is wrong :(")
+				}
+			}
+
+			else if (room == "Start") {
+				gameStart2();
+			}
+			else if (room == "Start 2") {
+				enterBedroom();
+			}
+			else if (room == "Bedroom") {
+				if (input == "north") {
+					enterKitchen();
+				}
+				
+				else if (input == "take newspaper") {
+					arrayCheck = jQuery.inArray("Newspaper", inventory);
+					if (arrayCheck != -1) {
+						print("You already have it in your inventory");
+					}
+					else {
+						inventory.push("Newspaper");
+						print("Newspaper taken")
+						bedroomDesc = bedroomDescNoNews;
+					}
+				}//end take newspaper
+			}//end bedroom
+
+			else if (room == "Kitchen") {
+				if (input == S) {
+					enterBedroom();
+				}
+				else if (input == E) {
+					enterBackyard();
+				}
+				else if (input == "look at cabinet") {
+					print(cabinetDesc);
+				}
+				else if (input == "open cabinet") {
+					print(insideCabinet);
+				}
+				else if (input == "look at bleach") {
+					print(bleachDesc);
+				}
+				else if (input == "look at eye dropper") {
+					print(eyeDropperDesc);
+				}
+				else if (input == "take bleach") {
+					arrayCheck = jQuery.inArray("Bleach", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave);
+					}
+					else {
+						inventory.push("Bleach");
+						print("Bleach taken");
+					}
+				}//end of take bleach
+				else if (input == "take eye dropper") {
+					arrayCheck = jQuery.inArray("Eye dropper", inventory);
+					if (arrayCheck != -1) {
+						print(alreadyHave);
+					}
+					else {
+						inventory.push("Eye dropper");
+						print("Eye dropper taken");
+					}
+				}// end of take eye dropper
+				else if (input == "look at cup") {
+					print(cupDesc);
+				}
+				else if (input == "take cup") {
+					arrayCheck = jQuery.inArray("Cup", inventory)
+					if (arrayCheck != -1) {
+						print(alreadyHave)
+					}
+					else {
+						inventory.push("Cup");
+						print("Cup taken")
+					}
+				}
+
+				else if (input == "use bleach on bucket filled with dirty water") {
+					arrayCheck = jQuery.inArray("Bucket with dirty water", inventory)
+					if (arrayCheck != -1) {
+
+						arrayCheck - jQuery.inArray("Bleach", inventory)
+						if (arrayCheck != -1) {
+							arrayCheck = jQuery.inArray("Eye dropper", inventory)
+							if (arrayCheck != -1) {
+								purify = true;
+								print("Enter how many drops of bleach to use for the <u>5 gallon bucket</u> filled with dirty water");
+							}
+							else {
+								print("You don't have the eye dropper")
+							}
+						}
+						else {
+							print("You don't have bleach")
+						}
+					}
+					else {
+						print("The bucket isn't filled with well water")
+					}
+				}//end of use bleach
+				else if (input == "drink water") {
+					arrayCheck = jQuery.inArray("Cup", inventory);
+					if(arrayCheck != -1) {
+						win();
+					}
+					else {
+						print("You need the right tool to hygienically drink from the bucket")
+					}
+				}
+
+
+
+			}//end of kitchen
+
+			else if (room == "Backyard") {
+				if (input == W) {
+					enterKitchen()
+				}
+				else if (input == "look at well") {
+					print(wellDesc);
+				}
+				else if (input == "look at bucket") {
+					print(bucketDesc);
+				}
+				else if (input == "take well") {
+					print("You try to lift well but fail. You can't lift and carry wells silly!")
+				}
+				else if (input == "take bucket") {
+					arrayCheck = jQuery.inArray("Bucket", inventory);
+					if (arrayCheck != -1) {
+						print(alreadyHave);
+					}
+					else {
+						inventory.push("Bucket");
+						print("Bucket taken.")
+					}
+				}//end of take bucket
+				else if (input == "use bucket on well") {
+					arrayCheck = jQuery.inArray("Bucket", inventory);
+					if (arrayCheck != -1) {
+						print("You attach the bucket to the rope on the well, lower it and collect water. The water looks clear but contains harmful bacteria");
+						inventory.splice(inventory.indexOf("Bucket"), 1);
+						inventory.push("Bucket with dirty water");
+						print("Go to the kitchen to disinfect the water");
+					}
+					else {
+						print("You don't have the bucket or it's already filled");
+					}
+				}//end of bucket on well
+
+			}//end of backyard
+
+
+			//code for each room
+
+			$("#consoleOutput").scrollTop($("#consoleOutput")[0].scrollHeight);
+			document.getElementById("textInput").value = "";
+
+		});
+	});	
+
+	function print(a) {
+		$("#consoleOutput").append(pFirst + a + pEnd);
+	}
+	function gameStart() {
+		room = "Start";
+		print("Level 2: Using bleach to disinfect water")
+		print("Hit enter to start...");
+	}
+	function gameStart2() {
+		room = "Start 2"
+		print(startDesc);
+		print("Hit enter to continue...");
+	}
+	function enterBedroom() {
+		room = "Bedroom";
+		print(bedroomDesc);
+		document.getElementById("textInput").setAttribute("list", "bedroomCommands");
+	}
+	function enterKitchen() {
+		room = "Kitchen";
+		print(kitchenDesc);
+		document.getElementById("textInput").setAttribute("list", "kitchenCommands");
+	}
+	function enterBackyard() {
+		room = "Backyard";
+		print(backyardDesc);
+	}
+	function waitTimer1() {
+		document.getElementById("textInput").disabled = true;
+		document.getElementById("waitTimer").innerHTML = "Wait time: 40 minutes";
+		setTimeout(waitTimer2, 1000);
+	}
+	function waitTimer2() {
+		document.getElementById("waitTimer").innerHTML = "Wait time: 20 minutes";
+		setTimeout(waitTimer3, 1000);
+	}
+	function waitTimer3() {
+		document.getElementById("waitTimer").innerHTML = "Finished!";
+		document.getElementById("textInput").disabled = false;
+		print("Now the water is safe to drink");
+		waterClean = true;
+	}
+	function win() {
+		print("You dip the cup into the bucket and drink the water, it tastes a bit strange but is 100% free of bacteria and pathogens");
+		print("<h2>You Win!</h2>")
+		print("You have sucessfully disinfected well water using house hold bleach");
+		print("<a href='c.html'>Next level</a>")
+	}
+
+</script>
+
+<div id="consoleOutput">
+	<p id="welcomeText"></p>
+</div>
+
+<form onsubmit="" id="mainForm">
+	<input type="text" id="textInput" autofocus="autofocus" autocomplete="off">
+	<!--list="commands"-->
+	<datalist id="bedroomCommands">
+		<option value="north"></option>
+		<option value="take newspaper"></option>
+		<option value="look at newspaper"></option>
+	</datalist>
+	<datalist id="kitchenCommands">
+		<option value="south"></option>
+		<option value="east"></option>
+		<option value="look at cabinet"></option>
+		<option value="open cabinet"></option>
+		<!--
+		<option value="look at bleach"></option>
+		<option value="look at eye dropper"></option>
+		<option value="take bleach"></option>
+		<option value="take eye dropper"></option>
+		<option value="look at cup"></option>
+		<option value="take cup"></option>
+
+		<option value="use bleach on bucket filled with dirty water"></option>
+		<option value="drink "></option>
+		<option value="take cup"></option>
+	-->
+	</datalist>
+	<datalist id="backyardCommands">
+		<option value="west"></option>
+		<option value="look at well"></option>
+		<option value="look at bucket"></option>
+		<option value="take bucket"></option>
+		<option value="use bucket on well"></option>
+	</datalist>
+
+
+
+	<input type="submit" id="submitButton" name="sumbit">
+</form>
+
+</body>
+</html>
